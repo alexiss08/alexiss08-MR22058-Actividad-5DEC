@@ -1,0 +1,58 @@
+section .data
+    num1 dd 100      ; Define la variable num1 con valor 100 (en formato double word 32 bits porque db es 8 bits)
+    num2 dd 5        ; Define la variable num2 con valor 5 (en formato double word 32 bits porque db es 8 bits)
+    msg6 dd  "El resultado de la division es: "; escribo un mensaje para mostrar y no debo olvidar mostrarlo antes que el resultado
+    len6 equ $ - msg6; aqui esta la Longitud del mensaje 
+    linea dd 0xA
+
+section .bss
+    resultado resb 2 ; Reserva espacio para almacenar el resultado de 2 bytes
+
+section .text
+global _start      ; Indica que _start es el punto de entrada del programa
+
+_start:            ; Etiqueta de inicio del programa
+    mov eax, [num1] ; Mueve el valor de num1 al registro eax
+    mov ebx, [num2] ; Mueve el valor de num2 al registro ebx
+
+    ; Divide eax por ebx y almacena el cociente en eax y el residuo en edx
+    div ebx
+
+    ; Convertir el cociente a ASCII
+    movzx eax, al   ; Copia el cociente (en AL) a EAX para extenderlo a 32 bits
+    mov ecx, 10     ; Establece el divisor a 10
+    xor edx, edx    ; Limpia EDX para la división
+    div ecx         ; Divide EAX (cociente) por 10, resultado en EAX (cociente), resto en EDX
+
+    ; Convertir los dígitos a ASCII y almacenarlos en la memoria
+    add eax, '0'    ; Convierte el cociente a ASCII
+    mov [resultado], al ; Almacena el valor de al en la primera posición de resultado
+
+    add dl, '0'     ; Convierte el resto a ASCII
+    mov [resultado + 1], dl ; Almacena el valor de dl en la segunda posición de resultado
+    
+    ; Imprimir el mensaje
+    mov eax, 4      ; Prepara la llamada al sistema para imprimir
+    mov ebx, 1      ; Establece stdout como el descriptor de archivo
+    mov ecx, msg6   ; Carga la dirección de memoria del mensaje
+    mov edx, len6   ; Carga la longitud del mensaje
+    int 0x80        ; Realiza la llamada al sistema para imprimir en la salida estándar
+    
+     ;salto de linea para mostrar el resultado
+    mov eax,4
+    mov ebx,1
+    mov ecx, linea
+    mov edx,1
+    int 0x80
+
+    ; Imprimir el resultado
+    mov eax, 4      ; Prepara la llamada al sistema para imprimir
+    mov ebx, 1      ; Establece stdout como el descriptor de archivo
+    mov ecx, resultado ; Carga la dirección de memoria de resultado
+    mov edx, 2      ; Carga la longitud de los datos a imprimir
+    int 0x80        ; Realiza la llamada al sistema para imprimir en la salida estándar
+
+    ; Salir del programa
+    mov eax, 1      ; Prepara la llamada al sistema para salir del programa
+    mov ebx, 0      ; Establece un código de salida exitoso
+    int 0x80        ; Realiza la llamada al sistema para finalizar el programa

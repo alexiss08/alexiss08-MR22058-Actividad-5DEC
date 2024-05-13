@@ -1,0 +1,56 @@
+section .data
+    num1 db 8        ; Define la variable num1 con valor 2 (en formato byte)
+    num2 db 10        ; Define la variable num2 con valor 1 (en formato byte)
+    mensaje db 'El resultado es: ', 0 ; Define el mensaje de resultado
+    linea dw 0xA
+
+segment .bss
+    resultado resb 2 ; Reserva espacio para almacenar el resultado de 2 bytes
+
+section .text
+global _start      ; Indica que _start es el punto de entrada del programa
+
+_start:            ; Etiqueta de inicio del programa
+    mov al, [num1] ; Mueve el valor de num1 al registro al
+    mov bl, [num2] ; Mueve el valor de num2 al registro bl
+
+    ; Multiplica al por bl y almacena el resultado en ax
+    mul bl         
+
+    mov ah, 0       ; Mueve el valor 0 al registro ah
+    mov bl, 10      ; Mueve el valor 10 al registro bl
+
+    div bl          ; Divide el contenido de ax por el valor en bl
+                    ; El cociente se almacena en al y el residuo en ah
+
+    add al, '0'     ; Convierte el valor en al a su equivalente en ASCII
+    add ah, '0'     ; Convierte el valor en ah a su equivalente en ASCII
+
+    mov [resultado], al     ; Almacena el valor de al en la primera posición de resultado
+    mov [resultado + 1], ah ; Almacena el valor de ah en la segunda posición de resultado
+
+    ; Imprime el mensaje "El resultado es: "
+    mov eax, 4       ; Prepara la llamada al sistema para imprimir
+    mov ebx, 1       ; Establece stdout como el descriptor de archivo
+    mov ecx, mensaje ; Carga la dirección de memoria del mensaje
+    mov edx, 16      ; Carga la longitud del mensaje (incluido el NULL terminator)
+    int 0x80         ; Realiza la llamada al sistema para imprimir en la salida estándar
+    
+    ;salto de linea para mostrar el resultado
+    mov eax,4
+    mov ebx,1
+    mov ecx, linea
+    mov edx,1
+    int 0x80
+
+    ; Imprime el resultado
+    mov eax, 4       ; Prepara la llamada al sistema para imprimir
+    mov ecx, resultado ; Carga la dirección de memoria de resultado
+    mov edx, 2       ; Carga la longitud de los datos a imprimir
+    int 0x80         ; Realiza la llamada al sistema para imprimir en la salida estándar
+
+    ; Salir del programa
+    mov eax, 1       ; Prepara la llamada al sistema para salir del programa
+    mov ebx, 0       ; Establece un código de salida exitoso
+    int 0x80         ; Realiza la llamada al sistema para finalizar el programa
+
