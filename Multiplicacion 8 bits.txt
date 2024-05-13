@@ -2,7 +2,7 @@ section .data
     num1 db 8        ; Define la variable num1 con valor 2 (en formato byte)
     num2 db 10        ; Define la variable num2 con valor 1 (en formato byte)
     mensaje db 'El resultado es: ', 0 ; Define el mensaje de resultado
-    linea dw 0xA
+    linea db 0xA
 
 segment .bss
     resultado resb 2 ; Reserva espacio para almacenar el resultado de 2 bytes
